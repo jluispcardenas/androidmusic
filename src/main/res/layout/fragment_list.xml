@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal"
+android:paddingRight="8dp"
+android:paddingBottom="8dp"
+android:paddingLeft="8dp"
+android:background="#FFF">
+
+<ImageView
+    android:id="@+id/activity_icon"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentTop="true"
+    android:alpha="0.5"
+    android:padding="2dp"
+    android:src="@android:drawable/btn_star" />
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_toEndOf="@id/activity_icon">
+    <Button
+        android:id="@+id/btn_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Play">
+
+    </Button>
+    <Button
+    android:id="@+id/btn_download"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Download">
+
+    </Button>
+    <TextView
+        android:id="@+id/item_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:paddingEnd="0dp"
+        android:paddingStart="8dp"
+        android:paddingTop="8dp"
+        tools:text="..."
+        android:textAppearance="?android:attr/textAppearanceListItem" />
+
+    <TextView
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingEnd="0dp"
+        android:paddingStart="8dp"
+        android:ellipsize="end"
+        tools:text="..."
+        android:textAppearance="?android:attr/textAppearanceListItem"/>
+
+    <GridLayout
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:layout_marginStart="0dp"
+        android:paddingEnd="0dp"
+        android:paddingStart="4dp"
+        android:columnCount="3" />
+
+    <TextView
+        android:id="@+id/activity_datetime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:ellipsize="end"
+        android:paddingEnd="0dp"
+        android:paddingStart="8dp"
+        tools:text="..."
+        android:textColor="?android:attr/textColorSecondary"/>
+
+</LinearLayout>
+
+</RelativeLayout>

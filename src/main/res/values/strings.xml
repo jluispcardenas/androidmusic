@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">MusicApp</string>
+    <string name="title_discover">Discover</string>
+    <string name="title_downloads">Downloads</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="file_pending">File processing, please try again in a moment</string>
+    <string name="file_invalid">Invalid file, we will review the problem shortly</string>
+    <string name="empty_notifications">You have no new notifications</string>
+</resources>
