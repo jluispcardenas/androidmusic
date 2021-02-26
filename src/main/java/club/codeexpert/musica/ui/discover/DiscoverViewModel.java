@@ -11,26 +11,32 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import club.codeexpert.musica.R;
 import club.codeexpert.musica.data.db.Song;
 import club.codeexpert.musica.managers.ApiManager;
 
 public class DiscoverViewModel extends ViewModel {
     private MutableLiveData<List<Song>> songs = new MutableLiveData<>();
 
+    @Inject
+    ApiManager apiManager;
+
+    @Inject
     public DiscoverViewModel() {
+
     }
 
     public LiveData<List<Song>> getResults(String method) {
-        ApiManager.getInstance().call(method, null, new Response.Listener<JSONObject>() {
+        this.apiManager.call(method, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 JSONArray data = null;
 
-                List<Song> newList = new ArrayList<>();
+                List<Song> newList = new ArrayList<Song>();
                 try {
                     data = response.getJSONArray("results");
                     int length = data.length();
@@ -42,14 +48,14 @@ public class DiscoverViewModel extends ViewModel {
                         String duration = data.getJSONObject(i).getString("duration");
                         String views = data.getJSONObject(i).getString("views");
                         String thumbnail = data.getJSONObject(i).getJSONArray("thumbnails").getString(0);
-                        boolean downloaded = ApiManager.getInstance().isDownloaded(id);
+                        boolean downloaded = DiscoverViewModel.this.apiManager.isDownloaded(id);
 
                         Song it = new Song(id, link, title, duration, views, thumbnail, downloaded);
 
                         newList.add(it);
                     }
 
-                    songs = (MutableLiveData<List<Song>>) newList;
+                    songs.setValue(newList);
 
                 } catch (JSONException e) {
                     e.printStackTrace();

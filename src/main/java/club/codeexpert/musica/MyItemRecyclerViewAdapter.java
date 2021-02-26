@@ -2,30 +2,40 @@ package club.codeexpert.musica;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import club.codeexpert.musica.data.db.Song;
 import club.codeexpert.musica.managers.ApiManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
 public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder> {
 
+    private Context context;
     private final List<Song> mValues;
+
+    ApiManager apiManager;
 
     public MyItemRecyclerViewAdapter(List<Song> items) {
         mValues = items;
     }
 
+    public void setApiManager(ApiManager apiManager) {
+        this.apiManager = apiManager;
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list, parent, false);
+        context = parent.getContext();
+        View view = LayoutInflater.from(context).inflate(R.layout.fragment_list, parent, false);
 
         return new ViewHolder(view);
     }
@@ -33,24 +43,44 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).title);
 
-        holder.mBtnPlay.setOnClickListener(new View.OnClickListener() {
+        holder.mTitleView.setText(holder.mItem.title);
+        holder.mContentView.setText("· " + holder.mItem.duration);
+
+        holder.mDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<Song> list = new ArrayList<Song>();
-                list.add(mValues.get(position));
-                MainActivity.mService.setList(list);
-                MainActivity.mService.playNext();
+                MyItemRecyclerViewAdapter.this.notifyDataSetChanged();
+
+                MainActivity.mService.setSong(position);
+                MainActivity.mService.playPauseSong();
             }
         });
 
+        if (MyItemRecyclerViewAdapter.this.apiManager.isDownloaded(holder.mItem.id)) {
+
+        }
+
+        if (MainActivity.mService.isCurrentSong(holder.mItem.id)) {
+            holder.mTitleView.setTextSize(20);
+        }
+
+        // Download button actions
         holder.mBtnDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Song item = mValues.get(position);
-                ApiManager.getInstance().requestDownloadFile(item);
+                if (!MyItemRecyclerViewAdapter.this.apiManager.isDownloaded(item.id)) {
+                    Toast.makeText(context, R.string.file_downloading, Toast.LENGTH_LONG).show();
+                    holder.mBtnDownload.setBackgroundColor(Color.GREEN);
+
+                    MyItemRecyclerViewAdapter.this.apiManager.requestDownloadFile(item);
+                } else {
+                    Toast.makeText(context, R.string.file_remove, Toast.LENGTH_LONG).show();
+                    holder.mBtnDownload.setBackgroundColor(Color.TRANSPARENT);
+
+                    MyItemRecyclerViewAdapter.this.apiManager.deleteDownload(item);
+                }
             }
         });
     }
@@ -62,19 +92,19 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mIdView;
+        public final TextView mTitleView;
         public final TextView mContentView;
-        public final Button mBtnPlay;
         public final Button mBtnDownload;
+        public final View mDetail;
         public Song mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.item_number);
+            mTitleView = (TextView) view.findViewById(R.id.title);
             mContentView = (TextView) view.findViewById(R.id.content);
-            mBtnPlay = (Button) view.findViewById(R.id.btn_play);
             mBtnDownload = (Button)view.findViewById(R.id.btn_download);
+            mDetail = (View)view.findViewById(R.id.detail);
         }
 
         @Override

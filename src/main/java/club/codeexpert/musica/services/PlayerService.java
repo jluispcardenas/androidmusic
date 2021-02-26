@@ -1,18 +1,20 @@
 package club.codeexpert.musica.services;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RemoteViews;
-
 
 import com.android.volley.Response;
 
@@ -23,6 +25,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 
+import androidx.core.app.NotificationCompat;
+import club.codeexpert.musica.MainActivity;
 import club.codeexpert.musica.R;
 import club.codeexpert.musica.data.db.Song;
 import club.codeexpert.musica.managers.ApiManager;
@@ -36,9 +40,12 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
 
     private int songPosn;
 
+    public ApiManager apiManager;
+
     //binder
     private final IBinder musicBind = new MusicBinder();
 
+    static private String currentSongId = "";
     private String songTitle = "";
     private String songAlbumart = "";
     private String songDuration = "";
@@ -51,12 +58,12 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     public static int currentPos = 0;
     NotificationManager mNotifiManager;
     public static final int NOTIFICATION_IDFOREGROUND_SERVICE = 78945;
-    public static final String ACTION_STOP="com.yourapp.ACTION_STOP";
-    public static final String ACTION_PLAY="com.yourapp.ACTION_PLAY";
-    public static final String ACTION_PAUSE="com.yourapp.ACTION_PAUSE";
-    public static final String ACTION_RESUME="com.yourapp.ACTION_RESUME";
-    public static final String ACTION_NEXT="com.yourapp.ACTION_NEXT";
-    public static final String ACTION_PREV="com.yourapp.ACTION_PREV";
+    public static final String ACTION_STOP = "com.musicapp.ACTION_STOP";
+    public static final String ACTION_PLAY = "com.musicapp.ACTION_PLAY";
+    public static final String ACTION_PAUSE = "com.musicapp.ACTION_PAUSE";
+    public static final String ACTION_RESUME = "com.musicapp.ACTION_RESUME";
+    public static final String ACTION_NEXT = "com.musicapp.ACTION_NEXT";
+    public static final String ACTION_PREV = "com.musicapp.ACTION_PREV";
     int REQUEST_CODE_STOP = 1111;
     int REQUEST_CODE_PAUSE = 2222;
     int REQUEST_CODE_RESUME = 3333;
@@ -84,7 +91,10 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     //pass song list
     public void setList(ArrayList<Song> theSongs) {
         songs = theSongs;
+    }
 
+    public void setApiManager(ApiManager apiManager) {
+        this.apiManager = apiManager;
     }
 
     public void appendItem(Song theSong) {
@@ -108,41 +118,65 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     public boolean onUnbind(Intent intent){
         //player.stop();
         //player.release();
+
         return false;
     }
 
     //set the song
-    public void setSong(int songIndex){
-        songPosn = songIndex;
+    public void setSong(int songIndex) {
+        if (songIndex >= songs.size()) {
+            songPosn = 0;
+        } else {
+            songPosn = songIndex;
+        }
+    }
+
+    public boolean isCurrentSong(String id) {
+        return currentSongId.equals(id);
+    }
+
+    public void playPauseSong() {
+        final Song playSong = songs.get(songPosn);
+        if (isCurrentSong(playSong.id)) {
+            if (player.isPlaying()) {
+                player.pause();
+            } else {
+                player.start();
+            }
+        } else {
+            playSong();
+        }
     }
 
     public void playSong() {
+        //get song
+        final Song playSong = songs.get(songPosn);
+
+        currentSongId = playSong.id;
         //play
         player.reset();
 
-        //get song
-        final Song playSong = songs.get(songPosn);
-        if (!ApiManager.getInstance().isDownloaded(playSong.id)) {
+        if (!this.apiManager.isDownloaded(playSong.id)) {
             final String songId = playSong.id;
-            ApiManager.getInstance().call("play/" + songId, null, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    try {
-                        if (response.has("url")) {
-                            String play_url = response.getString("url");
-                            if (!play_url.equals("")) {
-                                playNow(playSong.title, playSong.duration, play_url);
+            this.apiManager.call("play/" + songId, null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            if (response.has("url")) {
+                                String play_url = response.getString("url");
+                                if (!play_url.equals("")) {
+                                    playNow(playSong.title, playSong.duration, play_url);
+                                } else {
+                                    Log.d("APP", String.valueOf(R.string.file_pending));
+                                }
                             } else {
-                                Log.d("APP", String.valueOf(R.string.file_pending));
+                                Log.d("APP", String.valueOf(R.string.file_invalid));
                             }
-                        } else {
-                            Log.d("APP", String.valueOf(R.string.file_invalid));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
                     }
-                }
-            });
+                });
         } else {
             String play_url = playSong.id + ".mp3";
             playNow(playSong.title, playSong.duration, play_url);
@@ -158,7 +192,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
                 Log.d("APP", "Playing: " + link);
                 player.setDataSource(link);
             } else {
-                File file =  new File(ApiManager.getInstance().getDir(), link);
+                File file =  new File(this.apiManager.getDir(), link);
                 Log.d("APP", "Playing: " + file.getAbsolutePath());
                 player.setDataSource(file.getAbsolutePath());
             }
@@ -175,7 +209,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         mp.start();
 
         //notification
-        //showControllerInNotification(songTitle, songDuration,songAlbumart);
+        showControllerInNotification(songTitle, songDuration,songAlbumart);
     }
 
     //playback methods
@@ -210,7 +244,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     //skip to previous track
     public void playPrev(){
         songPosn--;
-        if (songPosn < 0) songPosn=songs.size()-1;
+        if (songPosn < 0) songPosn = songs.size()-1;
 
         playSong();
     }
@@ -222,26 +256,19 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         playSong();
     }
 
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
             String action = intent.getAction();
 
             if (!TextUtils.isEmpty(action)) {
                 if (action.equals(ACTION_PLAY)) {
-                    ispaused = false;
-                    playSong();
-
+                    ispaused = !ispaused;
+                    playPauseSong();
                 } else if (action.equals(ACTION_PAUSE)) {
                     pausePlayer();
                     currentPos = getPosn();
                     ispaused = true;
-
-
-                } else if (action.equals(ACTION_RESUME)) {
-                    seek(currentPos);
-
-                    ispaused = false;
-                    start();
                 } else if (action.equals(ACTION_STOP)) {
                     ispaused = false;
                     player.stop();
@@ -256,7 +283,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
             }
         }
 
-        return super.onStartCommand(intent, flags, startId);
+        return Service.START_STICKY;// super.onStartCommand(intent, flags, startId);
     }
 
     @Override
@@ -270,82 +297,50 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
 
     }
 
-    /*private void showControllerInNotification(String title,String duration,String songAlbumart) {
+    private void showControllerInNotification(String title,String duration,String songAlbumart) {
         PendingIntent pendingIntent = null;
         Intent intent = null;
 
-        //Inflate a remote view with a layout which you want to display in the notification bar.
         if (mRemoteViews == null) {
-            mRemoteViews = new RemoteViews(getPackageName(),
-                    R.layout.status_bar);
+            mRemoteViews = new RemoteViews(getPackageName(), R.layout.status_bar);
         }
 
-        if (songAlbumart=="")
-            mRemoteViews.setImageViewResource(R.id.status_bar_album_art,R.drawable.musicplayericon);
-        else {
-            //Drawable image = Drawable.createFromPath(songAlbumart);
-            Bitmap bitmap = BitmapFactory.decodeFile(songAlbumart);
-            mRemoteViews.setImageViewBitmap(R.id.status_bar_album_art, bitmap);
-            //mRemoteViews.setImageViewResource(R.id.status_bar_album_art, image);
-        }
         mRemoteViews.setTextViewText(R.id.status_bar_track_name, title);
 
-        float dua= Float.valueOf(duration);
-        dua=dua/60000;
-
-        //mRemoteViews.setTextViewText(R.id.status_bar_progress_music, String.format("%.2f", dua));
-        mRemoteViews.setImageViewResource(R.id.status_bar_playpause, R.drawable.apollo_holo_dark_pause);
-        mRemoteViews.setImageViewResource(R.id.status_bar_next, R.drawable.apollo_holo_dark_next);
-
-        //Define what you want to do after clicked the button in notification.
-        //Here we launcher a service by an action named "ACTION_STOP" which will stop the music play.
-        intent = new Intent(ACTION_STOP);
-        pendingIntent = PendingIntent.getService(getApplicationContext(),
-                REQUEST_CODE_STOP, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        mRemoteViews.setOnClickPendingIntent(R.id.status_bar_collapse,
-                pendingIntent);
-
-        //mRemoteViews.setBackgroundColor(0x0000FF00);
-        Intent intentpause = new Intent(ACTION_PAUSE);
-        PendingIntent pendingIntentpause = PendingIntent.getService(getApplicationContext(),
-                REQUEST_CODE_PAUSE, intentpause,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        mRemoteViews.setOnClickPendingIntent(R.id.status_bar_playpause,
-                pendingIntentpause);
+        Intent intentpause = new Intent(ACTION_PLAY);
+        PendingIntent pendingIntentpause = PendingIntent.getService(getApplicationContext(), REQUEST_CODE_PAUSE, intentpause, PendingIntent.FLAG_UPDATE_CURRENT);
+        mRemoteViews.setOnClickPendingIntent(R.id.status_bar_play, pendingIntentpause);
 
         Intent intentnext = new Intent(ACTION_NEXT);
-        PendingIntent pendingIntentnext = PendingIntent.getService(getApplicationContext(),
-                REQUEST_CODE_NEXT, intentnext,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        mRemoteViews.setOnClickPendingIntent(R.id.status_bar_next,
-                pendingIntentnext);
+        PendingIntent pendingIntentnext = PendingIntent.getService(getApplicationContext(), REQUEST_CODE_NEXT, intentnext, PendingIntent.FLAG_UPDATE_CURRENT);
+        mRemoteViews.setOnClickPendingIntent(R.id.status_bar_next, pendingIntentnext);
 
         Intent intentprev = new Intent(ACTION_PREV);
-        PendingIntent pendingIntentprev = PendingIntent.getService(getApplicationContext(),
-                REQUEST_CODE_PREV, intentprev,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        mRemoteViews.setOnClickPendingIntent(R.id.status_bar_prev,
-                pendingIntentprev);
+        PendingIntent pendingIntentprev = PendingIntent.getService(getApplicationContext(), REQUEST_CODE_PREV, intentprev, PendingIntent.FLAG_UPDATE_CURRENT);
+        mRemoteViews.setOnClickPendingIntent(R.id.status_bar_prev, pendingIntentprev);
 
 
-        Intent intentactivity=new Intent(getApplicationContext(), ListMusic.class);
-        PendingIntent pendingIntentActivity = PendingIntent.getActivity(getApplicationContext(),
-                REQUEST_CODE_ACTVITY, intentactivity,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent intentactivity = new Intent(getApplicationContext(), MainActivity.class);
+        PendingIntent pendingIntentActivity = PendingIntent.getActivity(getApplicationContext(), REQUEST_CODE_ACTVITY, intentactivity, PendingIntent.FLAG_UPDATE_CURRENT);
         //Create the notification instance.
-        mNotification = new NotificationCompat.Builder(getApplicationContext())
-                .setSmallIcon(R.drawable.notificationimage)
+        NotificationCompat.Builder mNotificationBuilder = new NotificationCompat.Builder(getApplicationContext())
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setOngoing(true)
                 .setWhen(System.currentTimeMillis())
                 .setContentIntent(pendingIntentActivity)
-                .setContent(mRemoteViews)
-                .build();
+                .setContent(mRemoteViews);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String channelId = "1211";
+            NotificationChannel channel = new NotificationChannel(channelId, "Channel human readable title", NotificationManager.IMPORTANCE_HIGH);
+            mNotifiManager.createNotificationChannel(channel);
+            mNotificationBuilder.setChannelId(channelId);
+        }
+
+        mNotification = mNotificationBuilder.build();
 
         mNotifiManager.notify(NOTIFICATION_IDFOREGROUND_SERVICE, mNotification);
-    }*/
-
+    }
 
     @Override
     public void onCompletion(MediaPlayer mp) {

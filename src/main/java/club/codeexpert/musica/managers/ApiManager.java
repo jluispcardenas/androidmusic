@@ -1,7 +1,6 @@
 package club.codeexpert.musica.managers;
 
-import android.content.Context;
-import android.content.ContextWrapper;
+
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -11,7 +10,10 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,27 +28,32 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import club.codeexpert.musica.R;
 import club.codeexpert.musica.data.SongRepository;
 import club.codeexpert.musica.data.db.Song;
 
+
 public class ApiManager {
     private static final String TAG = "ApiManager";
-    private static ApiManager instance = null;
-
     private static final String URL = "http://music.codeexpert.club:8000/";
 
+    SongRepository songRepository;
+
     public RequestQueue requestQueue;
+
     public RequestQueue requestQueueDownloads;
 
     List<String> requested;
     List<String> songsDownloaded;
 
-    static File directory = null;
-    Context context;
+    File directory;
 
-    private ApiManager(Context context) {
-        this.context = context;
+
+    @Inject
+    public ApiManager(SongRepository songRepository, RequestQueue requestQueue, RequestQueue requestQueueDownloads, File directory) {
+        /*this.context = context;
         requestQueue = Volley.newRequestQueue(context.getApplicationContext());
         requestQueueDownloads = Volley.newRequestQueue(context.getApplicationContext());
 
@@ -55,19 +62,21 @@ public class ApiManager {
 
         ContextWrapper contextWrapper = new ContextWrapper(context);
         directory = contextWrapper.getDir(context.getFilesDir().getName(), Context.MODE_PRIVATE);
-    }
+         */
+        this.songRepository = songRepository;
+        this.requestQueue = requestQueue;
+        this.requestQueueDownloads = requestQueueDownloads;
+        this.directory = directory;
 
-    public static synchronized ApiManager getInstance(Context context) {
-        if (null == instance) instance = new ApiManager(context);
-
-        return instance;
-    }
-
-    public static synchronized ApiManager getInstance() {
-        if (null == instance) {
-            throw new IllegalStateException(ApiManager.class.getSimpleName() + " is not initialized, call getInstance(...) first");
-        }
-        return instance;
+        AsyncTask<String, Integer, String> task = new AsyncTask<String, Integer, String>() {
+            @Override
+            protected String doInBackground(String... urlParams) {
+                songsDownloaded = ApiManager.this.songRepository.getIDs();
+                requested = songsDownloaded;
+                return null;
+            }
+        };
+        task.execute();
     }
 
     public File getDir() {
@@ -87,48 +96,6 @@ public class ApiManager {
     public boolean addDownloaded(String id) {
         return songsDownloaded.add(id);
     }
-
-    /*public void callRecyclerView(String method, JSONObject jsonRequest, final ArrayList<MusicItem> mItems, final MyItemRecyclerViewAdapter mAdapter) {
-        final String url = URL + method;
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, jsonRequest, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                JSONArray data = null;
-                Log.d("APP", "Request: " + url);
-                ArrayList<MusicItem> newList = new ArrayList<>();
-                try {
-                    data = response.getJSONArray("results");
-                    int length = data.length();
-                    Log.d("APP", "Length: " + length);
-                    for (int i = 0; i < length; i++) {
-                        String id = data.getJSONObject(i).getString("id");
-                        String link = data.getJSONObject(i).getString("link");
-                        String title = data.getJSONObject(i).getString("title");
-                        String duration = data.getJSONObject(i).getString("duration");
-                        String views = data.getJSONObject(i).getString("views");
-                        String thumbnail = data.getJSONObject(i).getJSONArray("thumbnails").getString(0);
-                        boolean downloaded = songsDownloaded.contains(id);
-
-                        MusicItem it = new MusicItem(id, link, title, duration, views, thumbnail, downloaded);
-                        newList.add(it);
-                    }
-
-                    mItems.clear();
-                    mItems.addAll(newList);
-                    mAdapter.notifyDataSetChanged();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-            }
-        });
-
-        requestQueue.add(jsonObjectRequest);
-    }*/
 
     public void call(String type, String method, JSONObject jsonRequest, Response.Listener listener, Response.ErrorListener errorListener) {
         String url = URL + method;
@@ -202,7 +169,20 @@ public class ApiManager {
         }
     }
 
-    public static class DownloadFile extends AsyncTask<Song, Integer, String> {
+    public void deleteDownload(final Song song) {
+        final String songId = song.id;
+        if (requested.contains(songId)) {
+            requested.remove(songId);
+        }
+
+        new RemoveDownload().execute(song);
+
+        if (songsDownloaded.contains(songId)) {
+            songsDownloaded.remove(songId);
+        }
+    }
+
+    public class DownloadFile extends AsyncTask<Song, Integer, String> {
         @Override
         protected String doInBackground(Song... urlParams) {
             final Song song = urlParams[0];
@@ -210,9 +190,9 @@ public class ApiManager {
 
             downloadFileToDevice(song, play_url);
 
-            SongRepository.getInstance().insertAll(song);
+            ApiManager.this.songRepository.insertAll(song);
 
-            getInstance().addDownloaded(song.id);
+            ApiManager.this.addDownloaded(song.id);
 
             return null;
         }
@@ -250,4 +230,19 @@ public class ApiManager {
         }
     }
 
+    public class RemoveDownload extends AsyncTask<Song, Integer, String> {
+        @Override
+        protected String doInBackground(Song... urlParams) {
+            final Song song = urlParams[0];
+            // remove from db
+            ApiManager.this.songRepository.delete(song);
+
+            // remove from device
+            String filename = song.id + ".mp3";
+            File file =  new File(directory, filename);
+            file.delete();
+
+            return null;
+        }
+    }
 }

@@ -32,11 +32,16 @@ public class Song {
     public Song(String id, String link, String title, String duration, String views, String thumbnail, boolean downloaded) {
         this.id = id;
         this.link = link;
-        this.title = title;
         this.duration = duration;
         this.views = views;
         this.thumbnail = thumbnail;
         this.downloaded = downloaded;
+
+        this.title = title;
+        String[] parts = title.split("(\\(|\\||\\]|\\\\)");
+        if (parts != null) {
+            this.title = parts[0];
+        }
     }
 }
 

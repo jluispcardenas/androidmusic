@@ -8,51 +8,50 @@ import android.os.Bundle;
 import android.os.IBinder;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import javax.inject.Inject;
 
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import club.codeexpert.musica.activities.BaseActivity;
-import club.codeexpert.musica.data.SongRepository;
-import club.codeexpert.musica.data.db.DbFactory;
-import club.codeexpert.musica.services.PlayerService;
 import club.codeexpert.musica.managers.ApiManager;
+import club.codeexpert.musica.services.PlayerService;
+import dagger.android.AndroidInjection;
+
 
 public class MainActivity extends BaseActivity {
     static public PlayerService mService;
     public boolean mBound = false;
 
+    @Inject
+    ApiManager apiManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
-        //if (!checkAuth()) return;
+        AndroidInjection.inject(this);
+
+        if (!checkAuth()) return;
 
         setContentView(R.layout.activity_main);
 
-        //FirebaseAuth auth = FirebaseAuth.getInstance();
-        //FirebaseUser current = auth.getCurrentUser();
-
-        /*TextView txt = (TextView)findViewById(R.id.welcome);
-        txt.setText(current.getDisplayName());
-
-        ImageView picture = (ImageView)findViewById(R.id.picture);
-        if (current.getPhotoUrl() != null)
-            Picasso.with(this).load(current.getPhotoUrl()); //.transform(new RoundedTransformation(30, 0)).into(picture);
-        */
-
-        ApiManager.getInstance(getApplicationContext());
-        SongRepository.getInstance(getApplicationContext());
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser current = auth.getCurrentUser();
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_discover, R.id.navigation_downloads, R.id.navigation_notifications)
+                R.id.navigation_discover, R.id.navigation_downloads, R.id.navigation_notifications, R.id.navigation_about)
                 .build();
 
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+//        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
     }
 
@@ -76,6 +75,7 @@ public class MainActivity extends BaseActivity {
         public void onServiceConnected(ComponentName className, IBinder service) {
             PlayerService.MusicBinder binder = (PlayerService.MusicBinder)service;
             mService = binder.getService();
+            mService.setApiManager(apiManager);
 
             mBound = true;
         }

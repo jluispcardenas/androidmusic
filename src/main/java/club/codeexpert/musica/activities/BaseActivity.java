@@ -16,6 +16,7 @@ public class BaseActivity extends AppCompatActivity {
             finish();
             return false;
         }
+
         return true;
     }
 

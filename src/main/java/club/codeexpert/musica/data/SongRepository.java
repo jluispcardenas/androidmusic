@@ -1,18 +1,17 @@
 package club.codeexpert.musica.data;
 
-import android.content.Context;
-
 import java.util.List;
 
-import androidx.room.Room;
-import club.codeexpert.musica.data.db.AppDatabase;
-import club.codeexpert.musica.data.db.DbFactory;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import club.codeexpert.musica.data.db.Song;
 import club.codeexpert.musica.data.db.SongDao;
 
+@Singleton
 public class SongRepository {
-    SongDao dao = null;
-    private static SongRepository instance;
+    SongDao songDao;
+    /*private static SongRepository instance;
 
     public static synchronized SongRepository getInstance(Context context) {
         if (null == instance)
@@ -30,22 +29,26 @@ public class SongRepository {
 
     public SongRepository(Context context) {
         dao = DbFactory.getInstance(context).songDao();
+    }*/
+
+    @Inject
+    public SongRepository(SongDao songDao) {
+        this.songDao = songDao;
     }
 
     public List<Song> getAll() {
-        return dao.getAll();
+        return songDao.getAll();
     }
 
     public List<String> getIDs() {
-        return dao.getIDs();
+        return songDao.getIDs();
     }
 
     public void insertAll(Song... songs) {
-        dao.insertAll(songs);
+        songDao.insertAll(songs);
     }
 
     public void delete(Song song) {
-        dao.delete(song);
+        songDao.delete(song);
     }
 }
-

@@ -41,7 +41,7 @@ public class SignedInActivity extends BaseActivity implements View.OnClickListen
         setContentView(R.layout.activity_signed_in);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("505144700955-fic7nsjc2qkjhtuq1tg1268o9e60s94p.apps.googleusercontent.com")
+                .requestIdToken("305771945226-60epnlgdf8ud8dunujgc5ggfdjku1057.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
 
@@ -56,6 +56,22 @@ public class SignedInActivity extends BaseActivity implements View.OnClickListen
         signInButton.setScopes(gso.getScopeArray());
 
         findViewById(R.id.sign_in_button).setOnClickListener(this);
+
+        mAuth = FirebaseAuth.getInstance();
+
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.i(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                } else {
+                    // User is signed out
+                    Log.i(TAG, "onAuthStateChanged:signed_out");
+                }
+            }
+        };
 
     }
 

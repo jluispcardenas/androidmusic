@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Mariachi</string>
+    <string name="title_main">Discover new music</string>
+    <string name="title_discover">Discover</string>
+    <string name="title_downloads">Downloads</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="search">Discover new music, type something!</string>
+    <string name="file_pending">File processing, please try again in a moment</string>
+    <string name="file_invalid">Invalid file, we will review the problem shortly</string>
+    <string name="empty_notifications">You have no new notifications</string>
+    <string name="file_downloading">Downloading music...</string>
+    <string name="file_remove">Removing file from device...</string>
+    <string name="title_about">About</string>
+    <string name="empty_about">This is an experimental project and is prone to errors.\nPlease feel free to contribute.\n\n\nGithub: jluispcardenas/androidmusic\nEmail: empresacardenas@gmail.com</string>
+</resources>
