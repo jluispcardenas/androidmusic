@@ -136,6 +136,10 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     }
 
     public void playPauseSong() {
+        if (songs == null) {
+            return;
+        }
+
         final Song playSong = songs.get(songPosn);
         if (isCurrentSong(playSong.id)) {
             if (player.isPlaying()) {
@@ -243,6 +247,10 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
 
     //skip to previous track
     public void playPrev(){
+        if (songs == null) {
+            return;
+        }
+
         songPosn--;
         if (songPosn < 0) songPosn = songs.size()-1;
 
@@ -250,6 +258,10 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     }
 
     public void playNext(){
+        if (songs == null) {
+            return;
+        }
+
         songPosn++;
         if (songPosn >= songs.size()) songPosn = 0;
 

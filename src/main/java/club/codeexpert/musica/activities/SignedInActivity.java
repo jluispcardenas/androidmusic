@@ -41,7 +41,7 @@ public class SignedInActivity extends BaseActivity implements View.OnClickListen
         setContentView(R.layout.activity_signed_in);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("305771945226-60epnlgdf8ud8dunujgc5ggfdjku1057.apps.googleusercontent.com")
+                .requestIdToken("376049778024-sb0e9busfa1ent0gpf15vuq648i38uud.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
 
