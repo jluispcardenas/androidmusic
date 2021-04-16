@@ -114,7 +114,6 @@ public class DiscoverFragment extends Fragment {
         mItems.addAll(items);
         mAdapter.notifyDataSetChanged();
 
-        MainActivity.mService.setList((ArrayList<Song>)items);
     }
 
 }

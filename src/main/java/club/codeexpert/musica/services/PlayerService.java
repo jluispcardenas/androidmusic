@@ -90,7 +90,9 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
 
     //pass song list
     public void setList(ArrayList<Song> theSongs) {
-        songs = theSongs;
+        if (theSongs != null && theSongs.size() > 0) {
+            songs = theSongs;
+        }
     }
 
     public void setApiManager(ApiManager apiManager) {
@@ -124,10 +126,12 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
 
     //set the song
     public void setSong(int songIndex) {
-        if (songIndex >= songs.size()) {
-            songPosn = 0;
-        } else {
-            songPosn = songIndex;
+        if (songs != null) {
+            if (songIndex >= songs.size()) {
+                songPosn = 0;
+            } else {
+                songPosn = songIndex;
+            }
         }
     }
 
@@ -136,7 +140,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     }
 
     public void playPauseSong() {
-        if (songs == null) {
+        if (songs == null || songs.size() == 0 || songPosn >= songs.size()) {
             return;
         }
 
@@ -153,6 +157,10 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     }
 
     public void playSong() {
+        if (songs == null || songs.size() == 0 || songPosn >= songs.size()) {
+            return;
+        }
+
         //get song
         final Song playSong = songs.get(songPosn);
 

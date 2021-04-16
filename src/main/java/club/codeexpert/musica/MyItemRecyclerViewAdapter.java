@@ -14,6 +14,7 @@ import android.widget.Toast;
 import club.codeexpert.musica.data.db.Song;
 import club.codeexpert.musica.managers.ApiManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -24,12 +25,18 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
 
     ApiManager apiManager;
 
+    private int mTrackPlaying = -1;
+
     public MyItemRecyclerViewAdapter(List<Song> items) {
         mValues = items;
     }
 
     public void setApiManager(ApiManager apiManager) {
         this.apiManager = apiManager;
+    }
+
+    public void setTrackPlaying(int position) {
+        mTrackPlaying = position;
     }
 
     @Override
@@ -50,10 +57,18 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
         holder.mDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MyItemRecyclerViewAdapter.this.notifyDataSetChanged();
+                //MyItemRecyclerViewAdapter.this.notifyDataSetChanged();
+
+                MainActivity.mService.setList((ArrayList<Song>)mValues);
 
                 MainActivity.mService.setSong(position);
                 MainActivity.mService.playPauseSong();
+
+                int oldValue = mTrackPlaying;
+
+                setTrackPlaying(position);
+                notifyItemChanged(position);
+                notifyItemChanged(oldValue);
             }
         });
 
@@ -61,8 +76,10 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
 
         }
 
-        if (MainActivity.mService.isCurrentSong(holder.mItem.id)) {
+        if(position == mTrackPlaying) {
             holder.mTitleView.setTextSize(20);
+        } else {
+            holder.mTitleView.setTextSize(17);
         }
 
         // Download button actions

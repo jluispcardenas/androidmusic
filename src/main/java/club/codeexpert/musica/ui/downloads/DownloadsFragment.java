@@ -84,8 +84,6 @@ public class DownloadsFragment extends Fragment {
             mItems.clear();
             mItems.addAll(songs);
             mAdapter.notifyDataSetChanged();
-
-            MainActivity.mService.setList((ArrayList<Song>)songs);
         }
     }
 }

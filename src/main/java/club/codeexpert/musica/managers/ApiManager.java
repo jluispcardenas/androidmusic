@@ -37,7 +37,7 @@ import club.codeexpert.musica.data.db.Song;
 
 public class ApiManager {
     private static final String TAG = "ApiManager";
-    private static final String URL = "http://music.codeexpert.club:8000/";
+    private static final String URL = /*"https://5rr4yhm404.execute-api.us-east-1.amazonaws.com/prod/";*/ "http://music.codeexpert.club:8000/";
 
     SongRepository songRepository;
 
@@ -97,6 +97,35 @@ public class ApiManager {
         return songsDownloaded.add(id);
     }
 
+    /*public void call(String type, String method, JSONObject jsonRequest, Response.Listener listener, Response.ErrorListener errorListener) {
+        String url = URL + method;
+
+        if (errorListener == null) {
+            errorListener = new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    error.printStackTrace();
+                }
+            };
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, jsonRequest, listener,  errorListener);
+        jsonObjectRequest.setTag("play");
+
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                30000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        if (type.equals("download")) {
+            requestQueueDownloads.add(jsonObjectRequest);
+        } else {
+            requestQueue.cancelAll("play");
+
+            requestQueue.add(jsonObjectRequest);
+        }
+    }*/
+
     public void call(String type, String method, JSONObject jsonRequest, Response.Listener listener, Response.ErrorListener errorListener) {
         String url = URL + method;
 
@@ -107,6 +136,29 @@ public class ApiManager {
                     error.printStackTrace();
                 }
             };
+        }
+
+        // new api request
+        if (!URL.contains("music.codeexpert")) {
+            url = URL;
+            String[] parts = method.split("\\?|/");
+            String apiMethod = parts[0].equals("") ? "search" : parts[0];
+            url += apiMethod;
+            if (parts.length > 1) {
+                try {
+                    if (jsonRequest == null) {
+                        jsonRequest = new JSONObject();
+                    }
+
+                    if (apiMethod.equals("play")) {
+                        jsonRequest.put("video_id", parts[1]);
+                    } else {
+                        jsonRequest.put("k", parts[1].replace("k=", ""));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, jsonRequest, listener,  errorListener);

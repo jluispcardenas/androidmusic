@@ -14,7 +14,6 @@ import com.google.firebase.auth.FirebaseUser;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
