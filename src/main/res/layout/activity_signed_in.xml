@@ -7,20 +7,24 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="club.codeexpert.musica.activities.SignedInActivity"
+    tools:context="club.codeexpert.music.activities.SignedInActivity"
+    android:background="@drawable/bg"
     android:orientation="vertical">
 
+
     <ImageView
+        android:src="@drawable/logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"/>
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/sign_in_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="24dp"
-        android:gravity="center"
+        android:gravity="center_horizontal|bottom"
         />
 </LinearLayout>

@@ -1,15 +1,15 @@
 <resources>
     <string name="app_name">Mariachi</string>
-    <string name="title_main">Discover new music</string>
-    <string name="title_discover">Discover</string>
-    <string name="title_downloads">Downloads</string>
-    <string name="title_notifications">Notifications</string>
-    <string name="search">Discover new music, type something!</string>
-    <string name="file_pending">File processing, please try again in a moment</string>
-    <string name="file_invalid">Invalid file, we will review the problem shortly</string>
-    <string name="empty_notifications">You have no new notifications</string>
-    <string name="file_downloading">Downloading music...</string>
-    <string name="file_remove">Removing file from device...</string>
-    <string name="title_about">About</string>
-    <string name="empty_about">This is an experimental project and is prone to errors.\nPlease feel free to contribute.\n\n\nGithub: jluispcardenas/androidmusic\nEmail: empresacardenas@gmail.com</string>
+    <string name="title_main">Descubre nueva música</string>
+    <string name="title_discover">Descubre</string>
+    <string name="title_downloads">Descargas</string>
+    <string name="title_notifications">Notificaciones</string>
+    <string name="search">Descubre nueva musica, escribe algo!</string>
+    <string name="file_pending">Archivo procesando, intenta de nuevo en un momento</string>
+    <string name="file_invalid">Archivo invalido, revisaremos en breve</string>
+    <string name="empty_notifications">No tienes notificaciones</string>
+    <string name="file_downloading">Descargando musica...</string>
+    <string name="file_remove">Borrando archivo del dispositivo...</string>
+    <string name="title_about">Sobre</string>
+    <string name="empty_about">Este es un proyecto experimental y es propenso a errores.\nSiéntete libre de contribuir.\n\n\nGithub: jluispcardenas/androidmusic\nEmail: empresacardenas@gmail.com</string>
 </resources>

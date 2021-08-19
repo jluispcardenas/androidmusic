@@ -3,12 +3,19 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingTop="6sp"
+    android:background="@drawable/layout_bg"
+    android:layout_marginTop="60dp"
+    >
 
     <EditText android:id="@+id/search"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:hint="Search">
+        android:hint="@string/search"
+        android:layout_margin="6sp"
+        android:maxLines="1"
+        android:inputType="text">
 
     </EditText>
 
@@ -17,9 +24,8 @@
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
         tools:listitem="@layout/fragment_list" />
-
 
 </LinearLayout>

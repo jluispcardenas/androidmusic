@@ -7,19 +7,25 @@
 
     <fragment
         android:id="@+id/navigation_discover"
-        android:name="club.codeexpert.musica.ui.discover.DiscoverFragment"
+        android:name="club.codeexpert.music.ui.discover.DiscoverFragment"
         android:label="@string/title_discover"
         tools:layout="@layout/fragment_discover" />
 
     <fragment
         android:id="@+id/navigation_downloads"
-        android:name="club.codeexpert.musica.ui.downloads.DownloadsFragment"
+        android:name="club.codeexpert.music.ui.downloads.DownloadsFragment"
         android:label="@string/title_downloads"
         tools:layout="@layout/fragment_downloads" />
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="club.codeexpert.musica.ui.notifications.NotificationsFragment"
+        android:name="club.codeexpert.music.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
+
+    <fragment
+        android:id="@+id/navigation_about"
+        android:name="club.codeexpert.music.ui.about.AboutFragment"
+        android:label="@string/title_about"
+        tools:layout="@layout/fragment_about" />
 </navigation>
