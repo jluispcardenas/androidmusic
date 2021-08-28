@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -54,8 +55,8 @@ public class DownloadsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_list_list, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.list);
 
-        TextView searchView = (TextView) view.findViewById(R.id.search);
-        searchView.setVisibility(View.INVISIBLE);
+        SearchView searchView = (SearchView) view.findViewById(R.id.search);
+        searchView.setVisibility(SearchView.INVISIBLE);
 
         Context context = view.getContext();
 

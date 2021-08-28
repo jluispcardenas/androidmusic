@@ -9,7 +9,7 @@
     android:layout_marginTop="60dp"
     >
 
-    <EditText android:id="@+id/search"
+    <SearchView android:id="@+id/search"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:hint="@string/search"
@@ -17,7 +17,7 @@
         android:maxLines="1"
         android:inputType="text">
 
-    </EditText>
+    </SearchView>
 
     <androidx.recyclerview.widget.RecyclerView
         xmlns:tools="http://schemas.android.com/tools"

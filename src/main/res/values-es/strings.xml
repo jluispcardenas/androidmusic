@@ -12,4 +12,5 @@
     <string name="file_remove">Borrando archivo del dispositivo...</string>
     <string name="title_about">Sobre</string>
     <string name="empty_about">Este es un proyecto experimental y es propenso a errores.\nSiéntete libre de contribuir.\n\n\nGithub: jluispcardenas/androidmusic\nEmail: empresacardenas@gmail.com</string>
+    <string name="loading">Cargando…</string>
 </resources>

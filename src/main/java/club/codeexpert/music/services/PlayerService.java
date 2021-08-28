@@ -11,10 +11,13 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 
@@ -24,6 +27,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.logging.Logger;
 
 import androidx.core.app.NotificationCompat;
 import club.codeexpert.music.MainActivity;
@@ -34,7 +38,7 @@ import club.codeexpert.music.managers.ApiManager;
 public class PlayerService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener {
 
     //media player
-    private MediaPlayer player;
+    static private MediaPlayer player;
 
     private ArrayList<Song> songs;
 
@@ -79,13 +83,6 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
 
         songPosn = 0;
 
-        player = new MediaPlayer();
-        player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-        //set listeners
-        player.setOnPreparedListener(this);
-        player.setOnCompletionListener(this);
-        player.setOnErrorListener(this);
     }
 
     //pass song list
@@ -156,6 +153,21 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         }
     }
 
+    protected void preparePlayer() {
+        if (player == null) {
+            player = new MediaPlayer();
+            //player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+            //set listeners
+            player.setOnPreparedListener(this);
+            player.setOnCompletionListener(this);
+            player.setOnErrorListener(this);
+        } else {
+            player.stop();
+            player.reset();
+        }
+    }
+
     public void playSong() {
         if (songs == null || songs.size() == 0 || songPosn >= songs.size()) {
             return;
@@ -165,12 +177,14 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         final Song playSong = songs.get(songPosn);
 
         currentSongId = playSong.id;
-        //play
-        player.stop();
-        player.reset();
+
+        // prepare to play
+        preparePlayer();
 
         if (!this.apiManager.isDownloaded(playSong.id)) {
             final String songId = playSong.id;
+            showToast(getString(R.string.loading));
+
             this.apiManager.call("play/" + songId, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -180,13 +194,14 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
                                 if (!play_url.equals("")) {
                                     playNow(playSong.title, playSong.duration, play_url);
                                 } else {
-                                    Log.d("APP", String.valueOf(R.string.file_pending));
+                                    showToast(String.valueOf(R.string.file_pending));
                                 }
                             } else {
-                                Log.d("APP", String.valueOf(R.string.file_invalid));
+                                showToast(String.valueOf(R.string.file_invalid));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            showToast("Error loading file");
                         }
                     }
                 });
@@ -226,7 +241,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     }
 
     //playback methods
-    public int getPosn(){
+    public int getPosn() {
         return player.getCurrentPosition();
     }
 
@@ -340,7 +355,6 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         PendingIntent pendingIntentprev = PendingIntent.getService(getApplicationContext(), REQUEST_CODE_PREV, intentprev, PendingIntent.FLAG_UPDATE_CURRENT);
         mRemoteViews.setOnClickPendingIntent(R.id.status_bar_prev, pendingIntentprev);
 
-
         Intent intentactivity = new Intent(getApplicationContext(), MainActivity.class);
         PendingIntent pendingIntentActivity = PendingIntent.getActivity(getApplicationContext(), REQUEST_CODE_ACTVITY, intentactivity, PendingIntent.FLAG_UPDATE_CURRENT);
         //Create the notification instance.
@@ -363,6 +377,18 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         mNotifiManager.notify(NOTIFICATION_IDFOREGROUND_SERVICE, mNotification);
     }
 
+    protected void showToast(final String msg) {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(),
+                        msg,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     @Override
     public void onCompletion(MediaPlayer mp) {
         //check if playback has reached the end of a track
@@ -375,7 +401,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
-        Log.e("MUSIC PLAYER", "Playback Error");
+        showToast("Playback Error");
         mp.reset();
         return false;
     }

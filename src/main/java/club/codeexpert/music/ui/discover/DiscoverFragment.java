@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.SearchView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,19 +66,19 @@ public class DiscoverFragment extends Fragment {
 
         //discoverViewModel = ViewModelProviders.of(this).get(DiscoverViewModel.class);
 
-        EditText editText = (EditText)view.findViewById(R.id.search);
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
+        SearchView editText = (SearchView) view.findViewById(R.id.search);
+        editText.setIconifiedByDefault(false);
+        editText.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             Handler handler = new Handler(Looper.getMainLooper() /*UI thread*/);
             Runnable runnable;
-            @Override public void afterTextChanged(final Editable s) {
+
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(final String s) {
                 handler.removeCallbacks(runnable);
                 runnable = new Runnable() {
                     @Override
@@ -91,6 +92,7 @@ public class DiscoverFragment extends Fragment {
                     }
                 };
                 handler.postDelayed(runnable, 1000);
+                return false;
             }
         });
 
