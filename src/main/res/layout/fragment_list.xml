@@ -93,7 +93,7 @@ android:background="@android:color/background_dark">
         android:id="@+id/btn_download"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:drawableLeft="@android:drawable/ic_menu_more"
+        android:drawableLeft="@android:drawable/stat_sys_download"
         android:background="@android:color/transparent"
         android:drawableTint="#999"
 

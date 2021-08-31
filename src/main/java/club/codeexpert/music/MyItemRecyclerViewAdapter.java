@@ -1,9 +1,13 @@
 package club.codeexpert.music;
 
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,10 +77,12 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
         });
 
         if (MyItemRecyclerViewAdapter.this.apiManager.isDownloaded(holder.mItem.id)) {
-
+            holder.mBtnDownload.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_delete, 0, 0, 0);
+        } else {
+            holder.mBtnDownload.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.stat_sys_download, 0, 0, 0);
         }
 
-        if(position == mTrackPlaying) {
+        if (position == mTrackPlaying) {
             holder.mTitleView.setTextSize(20);
         } else {
             holder.mTitleView.setTextSize(17);
@@ -89,12 +95,12 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
                 Song item = mValues.get(position);
                 if (!MyItemRecyclerViewAdapter.this.apiManager.isDownloaded(item.id)) {
                     Toast.makeText(context, R.string.file_downloading, Toast.LENGTH_LONG).show();
-                    holder.mBtnDownload.setBackgroundColor(Color.GREEN);
+                    holder.mBtnDownload.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_delete, 0, 0, 0);
 
                     MyItemRecyclerViewAdapter.this.apiManager.requestDownloadFile(item);
                 } else {
                     Toast.makeText(context, R.string.file_remove, Toast.LENGTH_LONG).show();
-                    holder.mBtnDownload.setBackgroundColor(Color.TRANSPARENT);
+                    holder.mBtnDownload.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.stat_sys_download, 0, 0, 0);
 
                     MyItemRecyclerViewAdapter.this.apiManager.deleteDownload(item);
                 }

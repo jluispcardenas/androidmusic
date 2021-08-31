@@ -4,8 +4,10 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,10 +32,11 @@ import club.codeexpert.music.managers.ApiManager;
 import dagger.android.support.AndroidSupportInjection;
 
 public class DiscoverFragment extends Fragment {
-
     RecyclerView recyclerView;
     ArrayList<Song> mItems = new ArrayList<Song>();
     MyItemRecyclerViewAdapter mAdapter = new MyItemRecyclerViewAdapter(mItems);
+    static private Bundle savedState;
+    private SearchView editText;
 
     @Inject
     ApiManager apiManager;
@@ -51,7 +54,6 @@ public class DiscoverFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -66,8 +68,33 @@ public class DiscoverFragment extends Fragment {
 
         //discoverViewModel = ViewModelProviders.of(this).get(DiscoverViewModel.class);
 
-        SearchView editText = (SearchView) view.findViewById(R.id.search);
+        editText = (SearchView) view.findViewById(R.id.search);
         editText.setIconifiedByDefault(false);
+        editText.setQueryHint(getString(R.string.search));
+
+        boolean restored = false;
+        if (savedInstanceState != null || savedState != null) {
+            Bundle sInstance = savedInstanceState != null ? savedInstanceState : savedState;
+            ArrayList<Song> sItems = sInstance.getParcelableArrayList("mItems");
+            if (sItems != null && sItems.size() > 0) {
+                refreshItems(sItems);
+                restored = true;
+            }
+            CharSequence k = sInstance.getCharSequence("k");
+            if (k != null) {
+                editText.setQuery(k, false);
+            }
+        }
+
+        if (!restored) {
+            discoverViewModel.getResults("search?k=music").observe(this, new Observer<List<Song>>() {
+                @Override
+                public void onChanged(List<Song> songs) {
+                    refreshItems(songs);
+                }
+            });
+        }
+
         editText.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             Handler handler = new Handler(Looper.getMainLooper() /*UI thread*/);
             Runnable runnable;
@@ -96,13 +123,6 @@ public class DiscoverFragment extends Fragment {
             }
         });
 
-        discoverViewModel.getResults("search?k=music").observe(this, new Observer<List<Song>>() {
-            @Override
-            public void onChanged(List<Song> songs) {
-                    refreshItems(songs);
-            }
-        });
-
         return view;
     }
 
@@ -110,7 +130,19 @@ public class DiscoverFragment extends Fragment {
         mItems.clear();
         mItems.addAll(items);
         mAdapter.notifyDataSetChanged();
-
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("mItems", mItems);
+        outState.putCharSequence("k", editText.getQuery());
+        super.onSaveInstanceState(outState);
+        savedState = outState;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        onSaveInstanceState(new Bundle());
+    }
 }

@@ -57,10 +57,10 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     private boolean ispaused = false;
     private Random rand;
 
-    Notification mNotification;
+    static Notification mNotification;
     static RemoteViews mRemoteViews;
     public static int currentPos = 0;
-    NotificationManager mNotifiManager;
+    static NotificationManager mNotifiManager;
     public static final int NOTIFICATION_IDFOREGROUND_SERVICE = 78945;
     public static final String ACTION_STOP = "com.musicapp.ACTION_STOP";
     public static final String ACTION_PLAY = "com.musicapp.ACTION_PLAY";

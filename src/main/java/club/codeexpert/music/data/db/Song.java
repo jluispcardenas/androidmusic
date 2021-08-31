@@ -1,12 +1,15 @@
 package club.codeexpert.music.data.db;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity
-public class Song {
+public class Song implements Parcelable {
     @PrimaryKey
     @NonNull
     public String id;
@@ -44,5 +47,14 @@ public class Song {
         }
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+
+    }
 }
 

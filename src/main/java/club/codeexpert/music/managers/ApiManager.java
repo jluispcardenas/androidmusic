@@ -149,7 +149,7 @@ public class ApiManager {
                     if (jsonRequest == null) {
                         jsonRequest = new JSONObject();
                     }
-                    if (apiMethod.equals("play")) {
+                    if (apiMethod.equals("play") || apiMethod.equals("download")) {
                         jsonRequest.put("video_id", parts[1]);
                         url += "?video_id=" + parts[1];
                     } else {
