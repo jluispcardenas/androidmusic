@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +29,7 @@ public class DownloadsFragment extends Fragment {
     RecyclerView recyclerView;
     ArrayList<Song> mItems = new ArrayList<Song>();
     MyItemRecyclerViewAdapter mAdapter = new MyItemRecyclerViewAdapter(mItems);
+    static private Bundle savedState;
 
     @Inject
     DownloadsViewModel downloadsViewModel;
@@ -66,9 +66,36 @@ public class DownloadsFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(mAdapter);
 
+        if (savedInstanceState != null || savedState != null) {
+            Bundle sInstance = savedInstanceState != null ? savedInstanceState : savedState;
+            ArrayList<Song> sItems = sInstance.getParcelableArrayList("mItems");
+            if (sItems != null && sItems.size() > 0) {
+                refreshItems(sItems);
+            }
+        }
+
         new GetDownloads().execute();
 
         return view;
+    }
+
+    public void refreshItems(List<Song> songs) {
+        mItems.clear();
+        mItems.addAll(songs);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("mItems", mItems);
+        super.onSaveInstanceState(outState);
+        savedState = outState;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        onSaveInstanceState(new Bundle());
     }
 
     public class GetDownloads extends AsyncTask<String, Integer, List<Song>> {
@@ -80,9 +107,7 @@ public class DownloadsFragment extends Fragment {
         @Override
         protected void onPostExecute(List<Song> songs) {
             super.onPostExecute(songs);
-            mItems.clear();
-            mItems.addAll(songs);
-            mAdapter.notifyDataSetChanged();
+            refreshItems(songs);
         }
     }
 }

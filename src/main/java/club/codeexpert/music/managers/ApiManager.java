@@ -22,7 +22,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import javax.inject.Inject;
 
@@ -141,6 +143,10 @@ public class ApiManager {
             String apiMethod = parts[0].equals("") ? "search" : parts[0];
             if (apiMethod.equals("search")) {
                 apiMethod = "search2";
+            } else if (type.equals("play") || type.equals("download")) {
+                // TODO: fix this
+                List<String> opts = Arrays.asList("", "2", "3");
+                apiMethod = "play" + opts.get((new Random()).nextInt(opts.size()));
             }
 
             url += apiMethod;
@@ -149,7 +155,7 @@ public class ApiManager {
                     if (jsonRequest == null) {
                         jsonRequest = new JSONObject();
                     }
-                    if (apiMethod.equals("play") || apiMethod.equals("download")) {
+                    if (type.equals("play") || type.equals("download")) {
                         jsonRequest.put("video_id", parts[1]);
                         url += "?video_id=" + parts[1];
                     } else {
@@ -235,9 +241,9 @@ public class ApiManager {
         }
     }
 
-    public class DownloadFile extends AsyncTask<Song, Integer, String> {
+    public class DownloadFile extends AsyncTask<Song, Integer, Song> {
         @Override
-        protected String doInBackground(Song... urlParams) {
+        protected Song doInBackground(Song... urlParams) {
             final Song song = urlParams[0];
             final String play_url = song.link;
 
@@ -247,7 +253,7 @@ public class ApiManager {
 
             ApiManager.this.addDownloaded(song.id);
 
-            return null;
+            return song;
         }
 
         private void downloadFileToDevice(Song song, String url_http) {
