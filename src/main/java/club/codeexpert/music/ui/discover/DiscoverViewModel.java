@@ -31,7 +31,7 @@ public class DiscoverViewModel extends ViewModel {
     }
 
     public LiveData<List<Song>> getResults(String method) {
-        this.apiManager.call(method, null, new Response.Listener<JSONObject>() {
+        this.apiManager.call("search", method, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 JSONArray data = null;
@@ -61,7 +61,7 @@ public class DiscoverViewModel extends ViewModel {
                     e.printStackTrace();
                 }
             }
-        });
+        }, null);
 
         return songs;
     }

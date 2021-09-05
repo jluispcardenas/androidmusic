@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,25 +96,27 @@ public class DiscoverFragment extends Fragment {
             Runnable runnable;
 
             @Override
-            public boolean onQueryTextSubmit(String s) {
+            public boolean onQueryTextSubmit(final String s) {
+                if (s.length() > 2) {
+                    handler.removeCallbacks(runnable);
+                    runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            discoverViewModel.getResults("search?k=" + s).observe(DiscoverFragment.this, new Observer<List<Song>>() {
+                                @Override
+                                public void onChanged(List<Song> songs) {
+                                    refreshItems(songs);
+                                }
+                            });
+                        }
+                    };
+                    handler.postDelayed(runnable, 1000);
+                }
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(final String s) {
-                handler.removeCallbacks(runnable);
-                runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        discoverViewModel.getResults("search?k=" + s).observe(DiscoverFragment.this, new Observer<List<Song>>() {
-                            @Override
-                            public void onChanged(List<Song> songs) {
-                                refreshItems(songs);
-                            }
-                        });
-                    }
-                };
-                handler.postDelayed(runnable, 1000);
                 return false;
             }
         });
