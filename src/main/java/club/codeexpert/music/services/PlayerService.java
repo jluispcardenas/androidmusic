@@ -204,7 +204,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
                     }
                 });
         } else {
-            String play_url = playSong.id + ".mp3";
+            String play_url = playSong.id + ".wav";
             playNow(playSong.title, playSong.duration, play_url);
         }
     }
@@ -214,7 +214,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         songDuration = duration;
         songAlbumart = "";
         try {
-            if (link.indexOf("http") != -1) {
+            if (link.contains("http")) {
                 Log.d("APP", "Playing: " + link);
                 player.setDataSource(link);
             } else {

@@ -2,23 +2,37 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     defaultConfig {
         applicationId "club.codeexpert.musica"
         minSdkVersion 27
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        targetSdkVersion 30
+        versionCode 14
+        versionName "1.14"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs{
+        debug {
+            keyAlias 'key0'
+            keyPassword 'sistemas'
+            storeFile file('C:\\Users\\jluis\\Downloads\\music_keystore.jks')
+            storePassword 'sistemas'
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        debug{
+            signingConfig signingConfigs.debug
+        }
+    }
+    buildFeatures {
+        viewBinding true
     }
 }
 
@@ -33,15 +47,24 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    implementation 'com.google.firebase:firebase-auth:19.3.2'
-    implementation 'com.google.android.gms:play-services-auth:18.1.0'
+    implementation platform('com.google.firebase:firebase-bom:26.3.0')
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.android.gms:play-services-auth:19.0.0'
     implementation 'com.android.volley:volley:1.1.1'
 
     implementation 'com.squareup.picasso:picasso:2.5.2'
+
+    implementation 'com.android.support:multidex:1.0.1'
+
+    implementation "com.google.dagger:dagger:2.23.2"
+    implementation "com.google.dagger:dagger-android-support:2.23.2"
+    annotationProcessor "com.google.dagger:dagger-android-processor:2.23.2"
+    annotationProcessor "com.google.dagger:dagger-compiler:2.23.2"
 
     def room_version = "2.2.5"
 

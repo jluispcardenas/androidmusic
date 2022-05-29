@@ -35,7 +35,7 @@ import club.codeexpert.music.data.db.Song;
 
 public class ApiManager {
     private static final String TAG = "ApiManager";
-    private static final String URL = "https://5rr4yhm404.execute-api.us-east-1.amazonaws.com/prod/"; // "http://music.codeexpert.club:8000/";
+    private static final String URL = "https://560zo4tew9.execute-api.us-east-1.amazonaws.com/prod"; // "http://music.codeexpert.club:8000/";
 
     SongRepository songRepository;
 
@@ -137,16 +137,12 @@ public class ApiManager {
         }
 
         // new api request
-        if (!URL.contains("music.codeexpert")) {
+        {
             url = URL;
             String[] parts = method.split("\\?|/");
             String apiMethod = parts[0].equals("") ? "search" : parts[0];
-            if (apiMethod.equals("search")) {
-                apiMethod = "search2";
-            } else if (type.equals("play") || type.equals("download")) {
-                // TODO: fix this
-                List<String> opts = Arrays.asList("", "2", "3");
-                apiMethod = "play" + opts.get((new Random()).nextInt(opts.size()));
+            if (type.equals("play") || type.equals("download")) {
+                apiMethod = "play";
             }
 
             url += apiMethod;
@@ -230,15 +226,11 @@ public class ApiManager {
 
     public void deleteDownload(final Song song) {
         final String songId = song.id;
-        if (requested.contains(songId)) {
-            requested.remove(songId);
-        }
+        requested.remove(songId);
 
         new RemoveDownload().execute(song);
 
-        if (songsDownloaded.contains(songId)) {
-            songsDownloaded.remove(songId);
-        }
+        songsDownloaded.remove(songId);
     }
 
     public class DownloadFile extends AsyncTask<Song, Integer, Song> {
@@ -267,7 +259,7 @@ public class ApiManager {
 
                 InputStream input = new BufferedInputStream(url.openStream());
 
-                String filename = song.id + ".mp3";
+                String filename = song.id + ".wav";
                 File file =  new File(directory, filename);
                 OutputStream output = new FileOutputStream(file);
                 Log.d("APP", file.getAbsolutePath());

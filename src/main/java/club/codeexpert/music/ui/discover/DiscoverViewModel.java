@@ -34,9 +34,9 @@ public class DiscoverViewModel extends ViewModel {
         this.apiManager.call("search", method, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                JSONArray data = null;
+                JSONArray data;
 
-                List<Song> newList = new ArrayList<Song>();
+                List<Song> newList = new ArrayList<>();
                 try {
                     data = response.getJSONArray("results");
                     int length = data.length();
@@ -45,9 +45,9 @@ public class DiscoverViewModel extends ViewModel {
                         String id = data.getJSONObject(i).getString("id");
                         String link = data.getJSONObject(i).getString("link");
                         String title = data.getJSONObject(i).getString("title");
-                        String duration = data.getJSONObject(i).getString("duration");
-                        String views = data.getJSONObject(i).getString("views");
-                        String thumbnail = data.getJSONObject(i).getJSONArray("thumbnails").getString(0);
+                        String duration = "0";// data.getJSONObject(i).getString("duration");
+                        String views = "0"; // data.getJSONObject(i).getString("views");
+                        String thumbnail = ""; // data.getJSONObject(i).getJSONArray("thumbnails").getString(0);
                         boolean downloaded = DiscoverViewModel.this.apiManager.isDownloaded(id);
 
                         Song it = new Song(id, link, title, duration, views, thumbnail, downloaded);
