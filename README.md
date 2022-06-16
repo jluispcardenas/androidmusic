@@ -1,19 +1,24 @@
-# androidmusic
-
 # DuBEAT 
 
-Listen and enjoy new music. Listen to thousands of songs for free.
+Listen and enjoy new music. Listen to thousands of songs royalty-free.
 
-This is an experimental app and is prone to errors.
-Feel free to collaborate.
+Some of the features:
+
+- Search new music in a simple way
+- Recomended songs
+- Download music on your device
+
+
+The app is developed using best practices and Clean Architecture.
+
+This is an experimental app, feel free to collaborate.
 
 DuBEAT in PlayStore:
 
-https://play.google.com/store/apps/details?id=club.codeexpert.musica
+https://play.google.com/store/apps/details?id=club.codeexpert.music
 
-For copyright reasons I am not allowed to update the app from the playstore. This is the direct download link:
+<a href="https://www.linkedin.com/in/jose-luis-cardenas-54366983"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" /></a>   <a href="mailto:jluispcardenas@gmail.com"><img src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white"></a>
 
-https://github.com/jluispcardenas/androidmusic/blob/master/app-release.aab
 
 
 <img width=400 src="https://github.com/jluispcardenas/androidmusic/raw/master/src/main/res/drawable/logo.png"/>
