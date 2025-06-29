@@ -13,5 +13,41 @@
     <string name="title_about">About</string>
     <string name="empty_about">This is an experimental project and is prone to errors.\nPlease feel free to contribute.\n\n\nGithub: jluispcardenas/androidmusic\nEmail: empresacardenas@gmail.com</string>
     <string name="loading">Loading…</string>
+    
+    <!-- Loading States -->
+    <string name="loading_search">Searching music…</string>
+    <string name="loading_downloads">Loading downloads…</string>
+    
+    <!-- Empty States -->
+    <string name="empty_discover_title">Discover Amazing Music</string>
+    <string name="empty_discover_subtitle">Search for your favorite songs and discover new music</string>
+    <string name="empty_downloads_title">No Downloads Yet</string>
+    <string name="empty_downloads_subtitle">Download songs to listen offline</string>
+    <string name="empty_search_title">No Results Found</string>
+    <string name="empty_search_subtitle">Try different keywords or check your spelling</string>
+    
+    <!-- Error States -->
+    <string name="error_network_title">Connection Problem</string>
+    <string name="error_network_subtitle">Check your internet connection and try again</string>
+    <string name="error_general_title">Something went wrong</string>
+    <string name="error_general_subtitle">Please try again later</string>
+    
+    <!-- Actions -->
+    <string name="action_retry">Try Again</string>
+    <string name="action_refresh">Refresh</string>
+    
+    <!-- Snackbar Messages -->
+    <string name="download_started">Download started</string>
+    <string name="download_completed">Download completed</string>
+    <string name="download_failed">Download failed</string>
+    <string name="file_removed">File removed</string>
+    <string name="playing_song">Playing song</string>
+    
+    <!-- Accessibility -->
+    <string name="content_desc_download">Download song</string>
+    <string name="content_desc_remove">Remove download</string>
+    <string name="content_desc_play">Play song</string>
+    <string name="content_desc_search">Search music</string>
+    <string name="content_desc_refresh">Refresh content</string>
 
 </resources>
